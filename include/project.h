@@ -35,6 +35,8 @@ public:
 
 public:
     QString root;
+    bool isWsl;
+    QString wslPath;
     QStringList groupNames;
     QMap<QString, int> mapGroups;
     QList<QStringList> groupedMapNames;

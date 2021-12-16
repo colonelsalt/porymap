@@ -89,6 +89,13 @@ void Project::initSignals() {
 }
 
 void Project::set_root(QString dir) {
+    if (dir.contains("wsl")) {
+        this->isWsl = true;
+        this->wslPath = (new QString(dir))->remove("//wsl.localhost/Ubuntu");
+    } else {
+        this->isWsl = false;
+    }
+    logInfo("Setting root: " + dir);
     this->root = dir;
     this->parser.set_root(dir);
 }
@@ -2370,7 +2377,8 @@ QString Project::getScriptDefaultString(bool usePoryScript, QString mapName) con
 
 QString Project::getMapScriptsFilePath(const QString &mapName) const {
     const bool usePoryscript = projectConfig.getUsePoryScript();
-    auto path = QDir::cleanPath(root + "/data/maps/" + mapName + "/scripts");
+    const QString projRoot = isWsl ? wslPath : root;
+    auto path = QDir::cleanPath(projRoot + "/data/maps/" + mapName + "/scripts");
     auto extension = getScriptFileExtension(usePoryscript);
     if (usePoryscript && !QFile::exists(path + extension))
         extension = getScriptFileExtension(false);

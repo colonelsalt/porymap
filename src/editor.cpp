@@ -2095,7 +2095,14 @@ void Editor::openInTextEditor(const QString &path, int lineNum) const {
         if (command.contains("%F")) {
             if (command.contains("%L"))
                 command.replace("%L", QString::number(lineNum));
-            command.replace("%F", '\"' + path + '\"');
+            QString realPath;
+            if (project->isWsl) {
+                realPath = QString(path).replace(project->root, project->wslPath);
+            } else {
+                realPath = path;
+            }
+
+            command.replace("%F", '\"' + realPath + '\"');
         } else {
             command += " \"" + path + '\"';
         }
@@ -2105,10 +2112,11 @@ void Editor::openInTextEditor(const QString &path, int lineNum) const {
 
 void Editor::openProjectInTextEditor() const {
     QString command = porymapConfig.getTextEditorOpenFolder();
+    QString projRoot = (project->isWsl) ? project->wslPath : project->root;
     if (command.contains("%D"))
-        command.replace("%D", '\"' + project->root + '\"');
+        command.replace("%D", '\"' + projRoot + '\"');
     else
-        command += " \"" + project->root + '\"';
+        command += " \"" + projRoot + '\"';
     startDetachedProcess(command);
 }
 
